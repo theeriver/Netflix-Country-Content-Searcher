@@ -1,0 +1,82 @@
+// Create and Name Variables and Lists
+var countryList = getColumn("Netflix Content", "Country");
+var titleList = getColumn("Netflix Content", "Title");
+var ratingList = getColumn("Netflix Content", "Rating");
+var genreList = getColumn("Netflix Content", "Genre");
+var chosenCountry;
+var search;
+var title;
+var rating;
+var genre;
+
+// Sets the dropdown elements to the listed countries
+setProperty("countryDropdown", "options" ,separateCountries(countryList));
+
+// Back Button on Search page
+onEvent("backButtonSearch", "click", function( ) {
+  setScreen("countryPickScreen");
+  setText("resultsTextArea", "");
+});
+
+// Search Bar
+onEvent("searchBar", "input", function( ) {
+  search = getText("searchBar");
+});
+
+// Search Button
+onEvent("searchButton", "click", function( ) {
+  setText("resultsTextArea", "");
+  filterTitles();
+});
+
+// Info Button
+onEvent("howButton", "click", function( ) {
+  setScreen("helpScreen");
+});
+
+// Back Button on Info page
+onEvent("howBackButton", "click", function ( ) {
+  setScreen("countryPickScreen");
+});
+
+onEvent("selectButton", "click", function( ) {
+  chosenCountry = getText("countryDropdown");
+  setScreen("contentSearchScreen");
+  setText("searchTitle", "Search content for " + chosenCountry);
+  
+});
+
+
+// Create Functions
+
+// Function to separate countries, remove duplicates, and alphabatize them
+function separateCountries(list) {
+  var uniqueElements = {};
+  for (var i = 0; i < list.length; i++) {
+    var element = list[i];
+    var elementArray = element.split(",");
+    for (var j = 0; j < elementArray.length; j++) {
+      var countryName = elementArray[j].trim();
+      if (countryName)
+      uniqueElements[countryName] = true;
+    }
+    
+  }
+  return Object.keys(uniqueElements).sort();
+}
+
+// Function to filter the titles based on the user's search and chosen country,
+// and to publish those results.
+function filterTitles() {
+  for (var i = 0; i < countryList.length; i++) {
+    if (titleList[i] == search && countryList[i] == chosenCountry) {
+      title = titleList[i];
+      rating = ratingList[i];
+      genre = genreList[i];
+      setText("resultsTextArea", (title + ("\n" + ("Rating: " + rating))) + ("\n" + ("Genre: " + genre)));
+    } else if (titleList[i] == search && countryList[i] != chosenCountry) {
+      setText("resultsTextArea", "I'm sorry, but it seems as if " + (search + (" is not avaiable in " + (chosenCountry + "."))));
+    }
+  }
+  
+}
