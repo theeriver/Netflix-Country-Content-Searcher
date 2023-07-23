@@ -3,11 +3,13 @@ var countryList = getColumn("Netflix Content", "Country");
 var titleList = getColumn("Netflix Content", "Title");
 var ratingList = getColumn("Netflix Content", "Rating");
 var genreList = getColumn("Netflix Content", "Genre");
+var typeList = getColumn("Netflix Content", "Type");
 var chosenCountry;
 var search;
 var title;
 var rating;
 var genre;
+var type;
 
 // Sets the dropdown elements to the listed countries
 setProperty("countryDropdown", "options" ,separateCountries(countryList));
@@ -39,6 +41,7 @@ onEvent("howBackButton", "click", function ( ) {
   setScreen("countryPickScreen");
 });
 
+// Select Button
 onEvent("selectButton", "click", function( ) {
   chosenCountry = getText("countryDropdown");
   setScreen("contentSearchScreen");
@@ -69,14 +72,21 @@ function separateCountries(list) {
 // and to publish those results.
 function filterTitles() {
   for (var i = 0; i < countryList.length; i++) {
-    if (titleList[i] == search && countryList[i] == chosenCountry) {
+    if (titleList[i] == search) {
       title = titleList[i];
       rating = ratingList[i];
       genre = genreList[i];
+      type = typeList[i];
+      if (countryList[i] == chosenCountry) {
+      setProperty("resultsTextArea", "font-size", 14);
       setText("resultsTextArea", (title + ("\n" + ("Rating: " + rating))) + ("\n" + ("Genre: " + genre)));
-    } else if (titleList[i] == search && countryList[i] != chosenCountry) {
+      return;
+    } else {
       setText("resultsTextArea", "I'm sorry, but it seems as if " + (search + (" is not avaiable in " + (chosenCountry + "."))));
+      return;
     }
-  }
-  
+  }  
+}
+setText("resultsTextArea", "Oops! It seems like as of currently, " + (search + (" is not in our system. Either it is too new of a " + (type + ", or it is not available on Netflix. Please try searching something else.")));
+setProperty("resultsTextArea", "font-size", 12);
 }
